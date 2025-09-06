@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Блокнот Машиниста · Lite v2025.25x6</title>
+<meta name="theme-color" content="#d32f2f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=202525x6">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png?v=202525x6">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png?v=202525x6">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png?v=202525x6">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+:root{--red:#d32f2f;--bg:#0f1420;--card:#161d2a;--line:#243246;--mut:#8aa0b6;--txt:#e9eef5}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;background:var(--red);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:18px}
+.badge{font-size:12px;padding:2px 8px;border:1px solid rgba(255,255,255,.4);border-radius:999px}
+.container{padding:12px 12px 84px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.row label{width:48%;color:var(--mut);font-size:14px}
+.row input,.row select,.row textarea{flex:1;background:#0e1622;border:1px solid var(--line);color:#e9eef5;padding:10px;border-radius:10px;font-size:16px}
+.row textarea{min-height:90px;resize:vertical}
+.btn{background:#1b2738;color:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:15px}
+.btn.primary{background:#fff;color:#d32f2f;border-color:#fff}
+.small{font-size:12px}
+.view{display:none}
+.view.active{display:block}
+.tabbar{position:fixed;left:0;right:0;bottom:0;height:70px;background:#121828;border-top:1px solid var(--line);display:flex}
+.tabbar button{flex:1;background:transparent;border:none;color:#8aa0b6;font-size:12px;padding:6px 0}
+.tabbar button.active{color:#fff}
+.tabbar .ico{display:block;font-size:18px;margin-bottom:4px}
+.progress{height:10px;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#0f2035}
+.progress>div{height:100%;background:#d32f2f;width:0%}
+.trip{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #233246}
+.trip:last-child{border-bottom:0}
+.actions{display:flex;gap:6px}
+.tap{cursor:pointer}
+.money{white-space:nowrap}
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 4px;border-bottom:1px solid #233246;text-align:left}
+th{color:#a9bacd}
+</style>
+</head>
+<body>
+<header>
+  <h1>Блокнот Машиниста</h1>
+  <div class="badge">Lite v2025.25x6</div>
+</header>
+
+<main class="container">
+  <!-- Главная -->
+  <section id="v-dashboard" class="view active">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><b>Месячная норма</b><b id="mwNorm">—</b></div>
+      <div class="progress" style="margin-top:6px"><div id="mwBar"></div></div>
+      <div class="row"><label>Норма, ч/мес</label><input id="tar_norm" type="number" inputmode="decimal" placeholder="176" onchange="tarSave()" oninput="tarSave()"></div>
+      <div class="row"><label>Отработано</label><div id="mwWorked" class="small">—</div></div>
+      <div class="row"><label>Выполнено</label><div id="mwPercent" class="small">—</div></div>
+      <div class="row"><label>Осталось/переработка</label><div id="mwRemain" class="small">—</div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Поездки</b>
+        <div>
+          <button class="btn primary" onclick="addTripOpen()">+ Добавить</button>
+          <button class="btn" onclick="exportTripsCsv()">CSV</button>
+        </div>
+      </div>
+
+      <div id="tripForm" class="card" style="display:none;margin-top:10px">
+        <div class="row"><label>Дата</label><input id="t_date" type="date"></div>
+        <div class="row"><label>Маршрут</label>
+          <input id="t_route" list="routeList" placeholder="Выберите из списка">
+          <datalist id="routeList"></datalist>
+        </div>
+        <div class="row"><label>Отправление</label><input id="t_start" type="time" value="08:00" oninput="recalcDuration()" onchange="recalcDuration()"></div>
+        <div class="row"><label>Прибытие</label><input id="t_end" type="
