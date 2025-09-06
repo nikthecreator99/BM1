@@ -1,1 +1,193 @@
-<!doctype html><meta charset='utf-8'><title>Блокнот Лайт</title><p>Лайт версия создана. Замените файлы, если текст видите.</p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Блокнот Машиниста · Single-file v2025.22a</title>
+<meta name="theme-color" content="#d32f2f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<style>
+:root{ --red:#d32f2f; --bg:#0f1420; --card:#161d2a; --line:#243246; --muted:#8aa0b6; --text:#e9eef5; }
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; margin:0; }
+body{ background:var(--bg); color:var(--text); font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+header{ position:sticky; top:0; z-index:2; background:#121828; border-bottom:1px solid var(--line); padding:12px 14px; }
+h1{ margin:0; font-size:18px; }
+.container{ padding:12px; padding-bottom:70px; }
+.card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:10px; }
+.row{ display:flex; gap:8px; align-items:center; margin:8px 0; }
+.row label{ width:42%; color:var(--muted); font-size:14px; }
+.row input, .row select, .row textarea{ flex:1; background:#0e1622; border:1px solid var(--line); color:var(--text); padding:10px; border-radius:12px; font-size:16px; }
+.row textarea{ min-height:90px; resize:vertical; }
+.btn{ background:#1b2738; color:var(--text); border:1px solid var(--line); padding:10px 14px; border-radius:12px; font-size:15px; }
+.btn.primary{ background:var(--red); border-color:#a51f1f; color:#fff; }
+.small{ font-size:12px; }
+.muted{ color:var(--muted); }
+.progress{ height:10px; border-radius:999px; background:#0f2035; overflow:hidden; border:1px solid var(--line); }
+.progress>div{ height:100%; background:var(--red); width:0%; }
+.view{ display:none; }
+.view.active{ display:block; }
+.tabbar{ position:fixed; left:0; right:0; bottom:0; height:60px; background:#121828; border-top:1px solid var(--line); display:flex; z-index:3; }
+.tabbar button{ flex:1; background:transparent; border:none; color:var(--muted); font-size:12px; padding:6px 0; }
+.tabbar button.active{ color:#fff; }
+.tabbar .ico{ display:block; font-size:18px; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<header><h1>Блокнот Машиниста</h1></header>
+<main class="container">
+  <section id="v-dashboard" class="view active">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><b>Месячная норма</b><b id="mwNorm">—</b></div>
+      <div class="progress" style="margin-top:6px"><div id="mwBar"></div></div>
+      <div class="row"><label>База нормы</label>
+        <select id="normBasis"><option value="calendar">Календарные дни</option><option value="working">Рабочие дни (Пн–Пт)</option></select>
+      </div>
+      <div class="row"><label>Отработано</label><div id="mwWorked" class="small">—</div></div>
+      <div class="row"><label>Выполнено</label><div id="mwPercent" class="small">—</div></div>
+      <div class="row"><label>Осталось/переработка</label><div id="mwRemain" class="small">—</div></div>
+      <hr style="border:0;border-top:1px solid var(--line)">
+      <div><b>Поездки</b> · <button id="addTripBtn" class="btn" style="margin-left:6px">+ Добавить</button></div>
+      <div id="tripList"></div>
+    </div>
+  </section>
+
+  <section id="v-sections" class="view">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Участки</b><button id="addSectionBtn" class="btn">Новый участок</button>
+      </div>
+      <div id="sectionForm" class="card" style="display:none;margin-top:8px">
+        <div class="row"><label>Название</label><input id="s_name"></div>
+        <div class="row"><label>Отправление</label><input id="s_from"></div>
+        <div class="row"><label>Прибытие</label><input id="s_to"></div>
+        <div class="row"><label>Длина (км)</label><input id="s_len" type="number" inputmode="decimal"></div>
+        <div class="row"><button id="s_save" class="btn primary">Сохранить</button><button id="s_cancel" class="btn">Отмена</button></div>
+      </div>
+      <div id="sectionList"></div>
+    </div>
+  </section>
+
+  <section id="v-tariffs" class="view">
+    <div class="card">
+      <b>Тарифы и надбавки</b>
+      <div class="row"><label>Тарифная ставка (₽/ч)</label><input id="tar_base" type="number" inputmode="decimal" placeholder="358.46"></div>
+      <div class="row"><label>Месячная норма (ч)</label><input id="tar_norm" type="number" inputmode="decimal" placeholder="176"></div>
+      <div class="row"><button id="tar_save" class="btn primary">Сохранить</button></div>
+    </div>
+  </section>
+
+  <section id="v-refs" class="view">
+    <div class="card">
+      <b>Шпаргалки</b>
+      <div class="row"><textarea id="refText" placeholder="Добавьте свои заметки…"></textarea></div>
+      <div class="row"><button id="ref_save" class="btn">Сохранить</button></div>
+    </div>
+  </section>
+
+  <section id="v-settings" class="view">
+    <div class="card">
+      <b>Бэкап</b>
+      <div class="row"><button id="backupBtn" class="btn">Скачать JSON</button></div>
+      <div class="row"><input id="restoreFile" type="file" accept="application/json"></div>
+      <div class="small muted">Версия single‑file 2025.22a</div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <button class="active" data-tab="dashboard"><span class="ico">🏠</span>Главная</button>
+  <button data-tab="sections"><span class="ico">🗺️</span>Участки</button>
+  <button data-tab="tariffs"><span class="ico">💳</span>Тарифы</button>
+  <button data-tab="refs"><span class="ico">📒</span>Справка</button>
+  <button data-tab="settings"><span class="ico">⚙️</span>Настройки</button>
+</nav>
+
+<script>
+(function(){
+  const $ = s=>document.querySelector(s);
+  const $$ = s=>Array.from(document.querySelectorAll(s));
+  function S(k,val){ if(arguments.length===2){ localStorage.setItem(k, JSON.stringify(val)); return val; }
+    const raw = localStorage.getItem(k); try{ return raw? JSON.parse(raw): null; }catch(e){ return null; } }
+  function fmtTime(min){ const h=Math.floor(min/60), m=min%60; return h+'ч '+String(m).padStart(2,'0')+'м'; }
+
+  // tabs
+  $$('.tabbar button').forEach(b=> b.addEventListener('click', ()=>{ 
+    $$('.tabbar button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    const v=b.getAttribute('data-tab'); $$('.view').forEach(x=>x.classList.remove('active')); $('#v-'+v).classList.add('active');
+  }));
+
+  // tariffs
+  const tariffs = S('tariffs_sf') || { base:358.46, norm:176 };
+  $('#tar_base').value = tariffs.base; $('#tar_norm').value = tariffs.norm;
+  $('#tar_save').addEventListener('click', ()=>{ const t={ base:Number($('#tar_base').value)||0, norm:Number($('#tar_norm').value)||0 }; S('tariffs_sf',t); updateDashboard(); });
+
+  // refs
+  $('#refText').value = S('refs_sf') || '';
+  $('#ref_save').addEventListener('click', ()=> S('refs_sf', $('#refText').value));
+
+  // sections
+  function renderSections(){
+    const list=$('#sectionList'); list.innerHTML='';
+    const arr=S('sections_sf')||[];
+    if(!arr.length){ const x=document.createElement('div'); x.className='muted small'; x.textContent='Нет участков'; list.appendChild(x);}
+    arr.forEach(s=>{
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML='<div><b>'+ (s.name||'—') +'</b></div><div class="small muted">'+(s.from||'—')+' → '+(s.to||'—')+' • '+(s.len||0)+' км</div>'
+        +'<div class="row"><button class="btn" data-edit="'+s.id+'">Редактировать</button><button class="btn" data-del="'+s.id+'">Удалить</button></div>';
+      list.appendChild(card);
+    });
+    list.querySelectorAll('[data-edit]').forEach(btn=> btn.addEventListener('click', ()=>{
+      const id=Number(btn.getAttribute('data-edit')); const s=(S('sections_sf')||[]).find(x=>x.id===id); if(!s) return;
+      $('#sectionForm').style.display='block'; $('#s_name').value=s.name||''; $('#s_from').value=s.from||''; $('#s_to').value=s.to||''; $('#s_len').value=s.len||'';
+      $('#s_save').onclick=()=>{ const arr=S('sections_sf')||[]; const i=arr.findIndex(x=>x.id===id); arr[i]={ id, name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 }; S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections(); };
+    }));
+    list.querySelectorAll('[data-del]').forEach(btn=> btn.addEventListener('click', ()=>{ const id=Number(btn.getAttribute('data-del')); const arr=(S('sections_sf')||[]).filter(x=>x.id!==id); S('sections_sf',arr); renderSections(); }));
+  }
+  $('#addSectionBtn').addEventListener('click', ()=>{
+    $('#sectionForm').style.display='block'; $('#s_name').value=''; $('#s_from').value=''; $('#s_to').value=''; $('#s_len').value='';
+    $('#s_save').onclick=()=>{ const arr=S('sections_sf')||[]; arr.push({ id:Date.now(), name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 }); S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections(); };
+  });
+  $('#s_cancel').addEventListener('click', ()=> $('#sectionForm').style.display='none');
+
+  // trips (simple)
+  function renderTrips(){
+    const list=$('#tripList'); list.innerHTML='';
+    const arr=S('trips_sf')||[];
+    if(!arr.length){ const d=document.createElement('div'); d.className='muted small'; d.textContent='Нет поездок'; list.appendChild(d);}
+    arr.forEach(t=>{ const c=document.createElement('div'); c.className='card'; c.innerHTML='<div><b>'+t.date+'</b> • '+(t.route||'—')+'</div><div class="small muted">'+(t.hours||0)+' ч</div>'; list.appendChild(c); });
+  }
+  $('#addTripBtn').addEventListener('click', ()=>{ 
+    const date=new Date().toISOString().slice(0,10); const route=prompt('Маршрут:',''); const hours=Number(prompt('Часы:','8')||0);
+    const arr=S('trips_sf')||[]; arr.push({ date, route, hours }); S('trips_sf',arr); renderTrips(); updateDashboard();
+  });
+
+  function updateDashboard(){
+    const t=S('tariffs_sf')||{ base:358.46, norm:176 };
+    const trips=S('trips_sf')||[];
+    const workedMin=Math.round((trips.reduce((a,x)=>a+(Number(x.hours)||0),0))*60);
+    const normMin=(Number(t.norm)||0)*60;
+    const percent=normMin? Math.round(workedMin/normMin*100) : 0;
+    const remain=normMin-workedMin;
+    $('#mwNorm').textContent=(t.norm||0)+' ч';
+    $('#mwWorked').textContent=fmtTime(workedMin);
+    $('#mwPercent').textContent=percent+'%';
+    $('#mwRemain').textContent=remain>=0? ('Осталось: '+fmtTime(remain)) : ('Переработка: '+fmtTime(-remain));
+    $('#mwBar').style.width=Math.min(percent,100)+'%';
+  }
+  $('#normBasis').addEventListener('change', updateDashboard);
+
+  // backup
+  $('#backupBtn').addEventListener('click', ()=>{ const data={ tariffs:S('tariffs_sf')||{}, trips:S('trips_sf')||[], sections:S('sections_sf')||[], refs:S('refs_sf')||'' };
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='bm-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 500);
+  });
+  $('#restoreFile').addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
+    if(d.tariffs) S('tariffs_sf', d.tariffs); if(d.trips) S('trips_sf', d.trips); if(d.sections) S('sections_sf', d.sections); if('refs' in d) S('refs_sf', d.refs);
+    renderTrips(); renderSections(); updateDashboard(); alert('Восстановлено'); }catch(err){ alert('Ошибка файла'); } }; rd.readAsText(f); });
+
+  // init
+  renderTrips(); renderSections(); updateDashboard();
+})();
+</script>
+</body>
+</html>
