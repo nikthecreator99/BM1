@@ -3,39 +3,63 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Блокнот Машиниста · Single-file v2025.22a</title>
+<title>Блокнот Машиниста · Lite v2025.25</title>
 <meta name="theme-color" content="#d32f2f">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png?v=202525">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png?v=202525">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png?v=202525">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=202525">
 <style>
 :root{ --red:#d32f2f; --bg:#0f1420; --card:#161d2a; --line:#243246; --muted:#8aa0b6; --text:#e9eef5; }
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body{ height:100%; margin:0; }
 body{ background:var(--bg); color:var(--text); font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
-header{ position:sticky; top:0; z-index:2; background:#121828; border-bottom:1px solid var(--line); padding:12px 14px; }
-h1{ margin:0; font-size:18px; }
-.container{ padding:12px; padding-bottom:70px; }
+header.appbar{ position:sticky; top:0; z-index:3; background:var(--red); color:#fff; padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.appbar .title{ font-weight:700; font-size:18px; }
+.appbar .muted{ opacity:.9; font-size:12px; }
+.container{ padding:12px; padding-bottom:90px; }
 .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:10px; }
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .row{ display:flex; gap:8px; align-items:center; margin:8px 0; }
 .row label{ width:42%; color:var(--muted); font-size:14px; }
 .row input, .row select, .row textarea{ flex:1; background:#0e1622; border:1px solid var(--line); color:var(--text); padding:10px; border-radius:12px; font-size:16px; }
 .row textarea{ min-height:90px; resize:vertical; }
 .btn{ background:#1b2738; color:var(--text); border:1px solid var(--line); padding:10px 14px; border-radius:12px; font-size:15px; }
-.btn.primary{ background:var(--red); border-color:#a51f1f; color:#fff; }
+.btn.primary{ background:#ffffff; color:#d32f2f; border-color:#fff; }
+.btn.ghost{ background:transparent; border-color:var(--line); }
 .small{ font-size:12px; }
-.muted{ color:var(--muted); }
+.muted{ color:#f8f8f8; opacity:.8; }
 .progress{ height:10px; border-radius:999px; background:#0f2035; overflow:hidden; border:1px solid var(--line); }
-.progress>div{ height:100%; background:var(--red); width:0%; }
+.progress>div{ height:100%; background:#d32f2f; width:0%; }
 .view{ display:none; }
 .view.active{ display:block; }
-.tabbar{ position:fixed; left:0; right:0; bottom:0; height:60px; background:#121828; border-top:1px solid var(--line); display:flex; z-index:3; }
-.tabbar button{ flex:1; background:transparent; border:none; color:var(--muted); font-size:12px; padding:6px 0; }
+.tabbar{ position:fixed; left:0; right:0; bottom:0; height:72px; background:#121828; border-top:1px solid var(--line); display:flex; z-index:3; }
+.tabbar button{ flex:1; background:transparent; border:none; color:#8aa0b6; font-size:12px; padding:6px 0; }
 .tabbar button.active{ color:#fff; }
 .tabbar .ico{ display:block; font-size:18px; margin-bottom:4px; }
+.segs{ display:flex; gap:6px; background:#0e1622; border:1px solid var(--line); border-radius:12px; padding:4px; }
+.segs button{ flex:1; border:none; padding:8px 10px; background:transparent; color:#8aa0b6; border-radius:8px; }
+.segs button.active{ background:#1a2435; color:#fff; }
+.trip{ display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #233246; }
+.trip:last-child{ border-bottom:0; }
+.section{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #233246; gap:8px; }
+.kv{ display:grid; grid-template-columns:1fr auto; gap:8px 12px; align-items:center; }
+hr.sep{ border:0; border-top:1px solid var(--line); margin:8px 0; }
+.right{ text-align:right; }
+.badge{ display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:#fff; font-size:12px; }
+table{ width:100%; border-collapse:collapse; }
+td,th{ border-bottom:1px solid #233246; padding:6px 4px; text-align:left; }
+th{ color:#a9bacd; font-weight:600; }
+a.link{ color:#8ecaff; text-decoration:none; }
 </style>
 </head>
 <body>
-<header><h1>Блокнот Машиниста</h1></header>
+<header class="appbar">
+  <div class="title">Блокнот Машиниста</div>
+  <div class="muted">Lite v2025.25</div>
+</header>
 <main class="container">
+  <!-- Главная -->
   <section id="v-dashboard" class="view active">
     <div class="card">
       <div style="display:flex;justify-content:space-between"><b>Месячная норма</b><b id="mwNorm">—</b></div>
@@ -46,37 +70,113 @@ h1{ margin:0; font-size:18px; }
       <div class="row"><label>Отработано</label><div id="mwWorked" class="small">—</div></div>
       <div class="row"><label>Выполнено</label><div id="mwPercent" class="small">—</div></div>
       <div class="row"><label>Осталось/переработка</label><div id="mwRemain" class="small">—</div></div>
-      <hr style="border:0;border-top:1px solid var(--line)">
-      <div><b>Поездки</b> · <button id="addTripBtn" class="btn" style="margin-left:6px">+ Добавить</button></div>
-      <div id="tripList"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Поездки</b>
+        <div>
+          <button id="addTripOpen" class="btn primary">+ Добавить</button>
+          <button id="exportTripsCsv" class="btn ghost">CSV</button>
+        </div>
+      </div>
+
+      <!-- Вкладки По дням/По месяцам -->
+      <div class="segs" style="margin-top:8px">
+        <button id="segDays" class="active">По дням</button>
+        <button id="segMonths">По месяцам</button>
+      </div>
+
+      <!-- Форма поездки -->
+      <div id="tripForm" class="card" style="display:none; margin-top:10px">
+        <div class="grid2">
+          <div class="row"><label>Дата</label><input id="t_date" type="date"></div>
+          <div class="row"><label>№ поезда</label><input id="t_train" placeholder="№"></div>
+          <div class="row"><label>Явка</label><input id="t_start" type="time"></div>
+          <div class="row"><label>Окончание</label><input id="t_end" type="time"></div>
+          <div class="row"><label>Локомотив</label><input id="t_loco" placeholder="ЭП1М‑xxx / 2ТЭ116‑xxx"></div>
+          <div class="row"><label>Стоянки (мин)</label><input id="t_stops" type="number" inputmode="numeric" placeholder="0"></div>
+        </div>
+        <div class="row"><label>Маршрут</label><input id="t_route" placeholder="Малошуйка — Обозерская"></div>
+        <div class="row"><label>Часы (итог)</label><input id="t_hours" type="number" inputmode="decimal" step="0.1" placeholder="8"></div>
+        <div class="row"><label>Заметки</label><textarea id="t_notes" placeholder="Особенности, простои…"></textarea></div>
+
+        <hr class="sep">
+        <div><b>Перегоны</b> <button id="segAdd" class="btn ghost">+ Добавить перегон</button></div>
+        <table id="segTable" style="margin-top:6px">
+          <thead><tr><th>Участок/перегон</th><th>Мин</th><th>Км</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="row"><button id="t_save" class="btn primary">Сохранить</button><button id="t_cancel" class="btn ghost">Отмена</button></div>
+      </div>
+
+      <!-- Списки -->
+      <div id="daysList" style="margin-top:8px"></div>
+      <div id="monthsList" style="margin-top:8px; display:none"></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Итог по месяцу</b>
+        <div>
+          <button id="exportMonthsCsv" class="btn ghost">CSV</button>
+          <button id="printMonth" class="btn ghost">PDF</button>
+        </div>
+      </div>
+      <div class="kv">
+        <div>Часы</div><div class="right"><b id="sumHours">—</b></div>
+        <div>Поездок</div><div class="right"><b id="sumTrips">—</b></div>
+        <div>Оклад (без надбавок)</div><div class="right"><b id="sumBase">—</b></div>
+        <div>Надбавки (+%)</div><div class="right"><b id="sumAddons">—</b></div>
+        <div>Ком. расходы</div><div class="right"><b id="sumComm">—</b></div>
+        <div><b>Итого</b></div><div class="right"><b id="sumTotal" class="badge">—</b></div>
+      </div>
     </div>
   </section>
 
+  <!-- Участки -->
   <section id="v-sections" class="view">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <b>Участки</b><button id="addSectionBtn" class="btn">Новый участок</button>
       </div>
-      <div id="sectionForm" class="card" style="display:none;margin-top:8px">
+      <div id="sectionForm" class="card" style="display:none; margin-top:8px">
         <div class="row"><label>Название</label><input id="s_name"></div>
         <div class="row"><label>Отправление</label><input id="s_from"></div>
         <div class="row"><label>Прибытие</label><input id="s_to"></div>
         <div class="row"><label>Длина (км)</label><input id="s_len" type="number" inputmode="decimal"></div>
-        <div class="row"><button id="s_save" class="btn primary">Сохранить</button><button id="s_cancel" class="btn">Отмена</button></div>
+        <div class="row"><button id="s_save" class="btn primary">Сохранить</button><button id="s_cancel" class="btn ghost">Отмена</button></div>
       </div>
       <div id="sectionList"></div>
     </div>
   </section>
 
+  <!-- Тарифы и профили -->
   <section id="v-tariffs" class="view">
     <div class="card">
       <b>Тарифы и надбавки</b>
-      <div class="row"><label>Тарифная ставка (₽/ч)</label><input id="tar_base" type="number" inputmode="decimal" placeholder="358.46"></div>
-      <div class="row"><label>Месячная норма (ч)</label><input id="tar_norm" type="number" inputmode="decimal" placeholder="176"></div>
-      <div class="row"><button id="tar_save" class="btn primary">Сохранить</button></div>
+      <div class="grid2">
+        <div class="row"><label>Тариф (₽/ч)</label><input id="tar_base" type="number" inputmode="decimal" placeholder="358.46"></div>
+        <div class="row"><label>Норма /мес (ч)</label><input id="tar_norm" type="number" inputmode="decimal" placeholder="176"></div>
+        <div class="row"><label>Районный %</label><input id="tar_region" type="number" inputmode="decimal" placeholder="20"></div>
+        <div class="row"><label>Северный %</label><input id="tar_north" type="number" inputmode="decimal" placeholder="50"></div>
+        <div class="row"><label>Класс %</label><input id="tar_class" type="number" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><label>Зональная %</label><input id="tar_zone" type="number" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><label>БАМ %</label><input id="tar_bam" type="number" inputmode="decimal" placeholder="0"></div>
+        <div class="row"><label>Ком.расходы /поездку (₽)</label><input id="tar_comm" type="number" inputmode="decimal" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <button id="tar_save" class="btn primary">Сохранить</button>
+        <select id="profileSelect" style="flex:1"></select>
+        <button id="profileSave" class="btn ghost">Сохранить как профиль</button>
+        <button id="profileDel" class="btn ghost">Удалить профиль</button>
+      </div>
+      <div class="small" style="opacity:.8">Профили позволяют хранить наборы надбавок (например, по разным депо/участкам) и быстро переключаться.</div>
     </div>
   </section>
 
+  <!-- Справка -->
   <section id="v-refs" class="view">
     <div class="card">
       <b>Шпаргалки</b>
@@ -85,16 +185,18 @@ h1{ margin:0; font-size:18px; }
     </div>
   </section>
 
+  <!-- Настройки -->
   <section id="v-settings" class="view">
     <div class="card">
       <b>Бэкап</b>
       <div class="row"><button id="backupBtn" class="btn">Скачать JSON</button></div>
       <div class="row"><input id="restoreFile" type="file" accept="application/json"></div>
-      <div class="small muted">Версия single‑file 2025.22a</div>
+      <div class="small" style="opacity:.8">Версия Lite single‑file 2025.25</div>
     </div>
   </section>
 </main>
 
+<!-- Таббар -->
 <nav class="tabbar">
   <button class="active" data-tab="dashboard"><span class="ico">🏠</span>Главная</button>
   <button data-tab="sections"><span class="ico">🗺️</span>Участки</button>
@@ -110,83 +212,426 @@ h1{ margin:0; font-size:18px; }
   function S(k,val){ if(arguments.length===2){ localStorage.setItem(k, JSON.stringify(val)); return val; }
     const raw = localStorage.getItem(k); try{ return raw? JSON.parse(raw): null; }catch(e){ return null; } }
   function fmtTime(min){ const h=Math.floor(min/60), m=min%60; return h+'ч '+String(m).padStart(2,'0')+'м'; }
+  function toMinutes(hhmm){ if(!hhmm) return 0; const [h,m]=hhmm.split(':').map(x=>Number(x)||0); return h*60+m; }
+  function csvEscape(v){ if(v==null) return ''; const s=String(v).replaceAll('"','""'); return /[",\n]/.test(s)? '"'+s+'"' : s; }
 
-  // tabs
-  $$('.tabbar button').forEach(b=> b.addEventListener('click', ()=>{ 
+  // Навигация
+  $$('.tabbar button').forEach(b=> b.addEventListener('click', ()=>{
     $$('.tabbar button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
     const v=b.getAttribute('data-tab'); $$('.view').forEach(x=>x.classList.remove('active')); $('#v-'+v).classList.add('active');
   }));
 
-  // tariffs
-  const tariffs = S('tariffs_sf') || { base:358.46, norm:176 };
-  $('#tar_base').value = tariffs.base; $('#tar_norm').value = tariffs.norm;
-  $('#tar_save').addEventListener('click', ()=>{ const t={ base:Number($('#tar_base').value)||0, norm:Number($('#tar_norm').value)||0 }; S('tariffs_sf',t); updateDashboard(); });
+  // Тарифы и профили
+  function getTariffs(){ return S('tariffs_sf') || { base:358.46, norm:176, region:20, north:50, klass:0, zone:0, bam:0, comm:0 }; }
+  function setTariffs(t){ S('tariffs_sf', t); }
+  function loadTariffsToForm(){
+    const t = getTariffs();
+    $('#tar_base').value=t.base; $('#tar_norm').value=t.norm; $('#tar_region').value=t.region||0; $('#tar_north').value=t.north||0;
+    $('#tar_class').value=t.klass||0; $('#tar_zone').value=t.zone||0; $('#tar_bam').value=t.bam||0; $('#tar_comm').value=t.comm||0;
+  }
+  function saveTariffsFromForm(){
+    const t = {
+      base: Number($('#tar_base').value)||0, norm: Number($('#tar_norm').value)||0,
+      region: Number($('#tar_region').value)||0, north: Number($('#tar_north').value)||0,
+      klass: Number($('#tar_class').value)||0, zone: Number($('#tar_zone').value)||0,
+      bam: Number($('#tar_bam').value)||0, comm: Number($('#tar_comm').value)||0
+    };
+    setTariffs(t); updateDashboard(); renderMonths(); updateTotals();
+  }
+  $('#tar_save').addEventListener('click', saveTariffsFromForm);
 
-  // refs
+  function loadProfiles(){
+    const list = S('profiles_sf')||[];
+    const sel = $('#profileSelect'); sel.innerHTML='';
+    if(!list.length){ const opt=document.createElement('option'); opt.value=''; opt.textContent='— профили отсутствуют —'; sel.appendChild(opt); return; }
+    list.forEach(p=>{ const opt=document.createElement('option'); opt.value=p.name; opt.textContent=p.name; sel.appendChild(opt); });
+  }
+  $('#profileSave').addEventListener('click', ()=>{
+    const name = prompt('Название профиля надбавок (например, «Север 50%»):','');
+    if(!name) return;
+    const list = S('profiles_sf')||[];
+    const t = getTariffs();
+    const existing = list.findIndex(x=>x.name===name);
+    const rec = { name, t };
+    if(existing>=0) list[existing]=rec; else list.push(rec);
+    S('profiles_sf', list); loadProfiles();
+    alert('Профиль сохранён');
+  });
+  $('#profileDel').addEventListener('click', ()=>{
+    const sel = $('#profileSelect'); const name = sel.value; if(!name) return;
+    const list = (S('profiles_sf')||[]).filter(x=>x.name!==name); S('profiles_sf', list); loadProfiles();
+  });
+  $('#profileSelect').addEventListener('change', ()=>{
+    const name = $('#profileSelect').value; if(!name) return;
+    const p = (S('profiles_sf')||[]).find(x=>x.name===name); if(!p) return;
+    setTariffs(p.t); loadTariffsToForm(); updateDashboard(); renderMonths(); updateTotals();
+  });
+
+  // Справка
   $('#refText').value = S('refs_sf') || '';
   $('#ref_save').addEventListener('click', ()=> S('refs_sf', $('#refText').value));
 
-  // sections
+  // Поездки
+  function getTrips(){ return S('trips_sf')||[]; }
+  function setTrips(a){ S('trips_sf', a); }
+
+  let editId = null;
+  function renderTripsByDays(){
+    const list = $('#daysList'); list.innerHTML='';
+    const arr = getTrips().slice().sort((a,b)=> (a.date||'').localeCompare(b.date));
+    if(!arr.length){ const d=document.createElement('div'); d.className='small'; d.style.opacity=.7; d.textContent='Нет поездок'; list.appendChild(d); }
+    arr.forEach(t=>{
+      const row = document.createElement('div'); row.className='trip';
+      const meta = [t.train?'№'+t.train:'', t.loco||''].filter(Boolean).join(' · ');
+      const kms = (t.km_total||0) ? (' · '+t.km_total+' км') : '';
+      row.innerHTML = '<div><div><b>'+ (t.date||'—') +'</b> • '+ (t.route||'—') +'</div><div class="small" style="opacity:.7">'+meta+kms+'</div></div>'
+        + '<div>'+ (t.hours||0) +' ч</div>'
+        + '<div><button class="btn ghost" data-edit="'+(t.id||'')+'">✎</button> <button class="btn ghost" data-del="'+(t.id||'')+'">🗑</button></div>';
+      list.appendChild(row);
+    });
+    // bind
+    list.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=>{
+      const id = Number(b.getAttribute('data-edit'));
+      const t = getTrips().find(x=> x.id===id);
+      if(!t) return;
+      editId = id;
+      $('#tripForm').style.display='block';
+      $('#t_date').value = t.date || new Date().toISOString().slice(0,10);
+      $('#t_route').value = t.route || '';
+      $('#t_train').value = t.train || '';
+      $('#t_loco').value = t.loco || '';
+      $('#t_start').value = t.start || '';
+      $('#t_end').value = t.end || '';
+      $('#t_stops').value = t.stops || 0;
+      $('#t_hours').value = t.hours || 0;
+      $('#t_notes').value = t.notes || '';
+      // segments
+      const tbody = $('#segTable tbody'); tbody.innerHTML='';
+      (t.segs||[]).forEach(s=> addSegRow(s.name||'', s.min||0, s.km||0));
+    }));
+    list.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=>{
+      const id = Number(b.getAttribute('data-del'));
+      const arr = getTrips().filter(x=> x.id!==id);
+      setTrips(arr); renderTripsByDays(); updateDashboard(); renderMonths(); updateTotals();
+    }));
+  }
+
+  function renderMonths(){
+    const root = $('#monthsList'); root.innerHTML='';
+    const arr = getTrips();
+    if(!arr.length){ const d=document.createElement('div'); d.className='small'; d.style.opacity=.7; d.textContent='Нет данных'; root.appendChild(d); return; }
+    const base = Number(getTariffs().base)||0;
+    // group by YYYY-MM
+    const map = {};
+    arr.forEach(t=>{
+      const ym = (t.date||'').slice(0,7) || '—';
+      if(!map[ym]) map[ym] = { hours:0, count:0, trips:[] };
+      map[ym].hours += Number(t.hours)||0;
+      map[ym].count += 1;
+      map[ym].trips.push(t);
+    });
+    const months = Object.keys(map).sort();
+    months.forEach(m=>{
+      const hours = map[m].hours;
+      const pay = Math.round(hours * base);
+      const div = document.createElement('div'); div.className='card';
+      div.innerHTML = '<div class="section"><div><b>'+m+'</b> • '+map[m].count+' рейс(а)</div><div>'+hours.toFixed(1)+' ч · ~'+pay.toLocaleString('ru-RU')+' ₽</div></div>';
+      const inner = document.createElement('div'); inner.style.display='none';
+      // build trips table inside
+      const tbl = document.createElement('table');
+      tbl.innerHTML = '<thead><tr><th>Дата</th><th>Маршрут</th><th>№</th><th>Локо</th><th>Часы</th><th>Км</th></tr></thead><tbody></tbody>';
+      const tb = tbl.querySelector('tbody');
+      map[m].trips.sort((a,b)=> (a.date||'').localeCompare(b.date)).forEach(t=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>'+ (t.date||'') +'</td><td>'+ (t.route||'') +'</td><td>'+ (t.train||'') +'</td><td>'+ (t.loco||'') +'</td><td>'+ (t.hours||0) +'</td><td>'+ (t.km_total||0) +'</td>';
+        tb.appendChild(tr);
+      });
+      inner.appendChild(tbl);
+      div.appendChild(inner);
+      div.addEventListener('click', ()=>{
+        inner.style.display = inner.style.display==='none' ? 'block' : 'none';
+      });
+      root.appendChild(div);
+    });
+  }
+
+  function updateTotals(){
+    const arr = getTrips();
+    const t = getTariffs();
+    const hours = arr.reduce((a,x)=> a+(Number(x.hours)||0), 0);
+    const trips = arr.length;
+    const basePay = hours * (Number(t.base)||0);
+    const addonFactor = 1 + (Number(t.region)||0 + Number(t.north)||0 + Number(t.klass)||0 + Number(t.zone)||0 + Number(t.bam)||0)/100;
+    const withAddons = basePay * addonFactor;
+    const comm = (Number(t.comm)||0) * trips;
+    const total = Math.round(withAddons + comm);
+    $('#sumHours').textContent = hours.toFixed(1)+' ч';
+    $('#sumTrips').textContent = String(trips);
+    $('#sumBase').textContent = Math.round(basePay).toLocaleString('ru-RU')+' ₽';
+    $('#sumAddons').textContent = Math.round(withAddons - basePay).toLocaleString('ru-RU')+' ₽';
+    $('#sumComm').textContent = Math.round(comm).toLocaleString('ru-RU')+' ₽';
+    $('#sumTotal').textContent = total.toLocaleString('ru-RU')+' ₽';
+  }
+
+  // Сегменты (перегоны)
+  function addSegRow(name='', minutes=0, km=0){
+    const tb = $('#segTable tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td><input class="segName" placeholder="Участок/перегон" value="'+(name||'')+'"></td>' +
+                   '<td><input class="segMin" type="number" inputmode="numeric" value="'+(minutes||0)+'"></td>' +
+                   '<td><input class="segKm" type="number" inputmode="decimal" value="'+(km||0)+'"></td>' +
+                   '<td><button class="btn ghost segDel">✖</button></td>';
+    tb.appendChild(tr);
+    tr.querySelector('.segDel').addEventListener('click', ()=> tr.remove());
+  }
+  $('#segAdd').addEventListener('click', ()=> addSegRow());
+
+  // Экспорт CSV
+  function exportTripsCsv(){
+    const arr = getTrips();
+    const head = ['Дата','Маршрут','№ поезда','Локомотив','Явка','Окончание','Стоянки (мин)','Часы','Км всего','Заметки'];
+    const rows = [head];
+    arr.forEach(t=>{
+      const line = [t.date||'', t.route||'', t.train||'', t.loco||'', t.start||'', t.end||'', t.stops||0, t.hours||0, t.km_total||0, (t.notes||'').replaceAll('\n',' ')];
+      rows.push(line);
+    });
+    const csv = rows.map(r=> r.map(csvEscape).join(';')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'trips.csv'; a.click();
+    setTimeout(()=> URL.revokeObjectURL(url), 500);
+  }
+  $('#exportTripsCsv').addEventListener('click', exportTripsCsv);
+
+  function exportMonthsCsv(){
+    const arr = getTrips();
+    // group by month
+    const map = {};
+    arr.forEach(t=>{
+      const ym = (t.date||'').slice(0,7) || '—';
+      if(!map[ym]) map[ym] = { hours:0, count:0 };
+      map[ym].hours += Number(t.hours)||0;
+      map[ym].count += 1;
+    });
+    const head = ['Месяц','Поездок','Часы'];
+    const rows = [head];
+    Object.keys(map).sort().forEach(m=> rows.push([m, map[m].count, map[m].hours.toFixed(1)]));
+    const csv = rows.map(r=> r.map(csvEscape).join(';')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'months.csv'; a.click();
+    setTimeout(()=> URL.revokeObjectURL(url), 500);
+  }
+  $('#exportMonthsCsv').addEventListener('click', exportMonthsCsv);
+
+  // Печать PDF текущего месяца (через системный диалог печати)
+  function printCurrentMonth(){
+    const arr = getTrips();
+    if(!arr.length){ alert('Нет поездок'); return; }
+    const ym = (new Date().toISOString().slice(0,7));
+    const trips = arr.filter(t=> (t.date||'').slice(0,7)===ym).sort((a,b)=> (a.date||'').localeCompare(b.date));
+    const t = getTariffs();
+    let html = '<html><head><meta charset="utf-8"><title>Отчёт '+ym+'</title></head><body style="font-family:Segoe UI,system-ui,sans-serif">';
+    html += '<h2>Отчёт за '+ym+'</h2>';
+    html += '<table border="1" cellspacing="0" cellpadding="6"><tr><th>Дата</th><th>Маршрут</th><th>№</th><th>Локо</th><th>Часы</th><th>Км</th><th>Заметки</th></tr>';
+    let hours=0, km=0;
+    trips.forEach(x=>{ hours += Number(x.hours)||0; km += Number(x.km_total)||0;
+      html += '<tr><td>'+ (x.date||'') +'</td><td>'+ (x.route||'') +'</td><td>'+ (x.train||'') +'</td><td>'+ (x.loco||'') +'</td><td>'+ (x.hours||0) +'</td><td>'+ (x.km_total||0) +'</td><td>'+ (x.notes||'').replaceAll('<','&lt;') +'</td></tr>'; });
+    const basePay = hours * (Number(t.base)||0);
+    const addonFactor = 1 + (Number(t.region)||0 + Number(t.north)||0 + Number(t.klass)||0 + Number(t.zone)||0 + Number(t.bam)||0)/100;
+    const comm = (Number(t.comm)||0) * trips.length;
+    const total = Math.round(basePay * addonFactor + comm);
+    html += '</table><p><b>Итого:</b> часов '+hours.toFixed(1)+', км '+km.toFixed(1)+', выплат ~ '+ total.toLocaleString('ru-RU') +' ₽</p>';
+    html += '<script>window.onload=function(){window.print();}</script></body></html>';
+    const w = window.open('about:blank','_blank'); if(!w){ alert('Разрешите всплывающие окна для печати.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  $('#printMonth').addEventListener('click', printCurrentMonth);
+
+  // Сегменты связаны с суммой км/мин
+  function collectSegs(){
+    const rows = Array.from(document.querySelectorAll('#segTable tbody tr'));
+    let segs = []; let km_total=0;
+    rows.forEach(r=>{
+      const name = r.querySelector('.segName').value.trim();
+      const min = Number(r.querySelector('.segMin').value)||0;
+      const km = Number(r.querySelector('.segKm').value)||0;
+      segs.push({name, min, km});
+      km_total += km;
+    });
+    return {segs, km_total};
+  }
+
+  // Переключатель списков По дням/По месяцам
+  $('#segDays').addEventListener('click', ()=>{
+    $('#segDays').classList.add('active'); $('#segMonths').classList.remove('active');
+    $('#daysList').style.display='block'; $('#monthsList').style.display='none';
+  });
+  $('#segMonths').addEventListener('click', ()=>{
+    $('#segMonths').classList.add('active'); $('#segDays').classList.remove('active');
+    $('#daysList').style.display='none'; $('#monthsList').style.display='block';
+  });
+
+  // Форма поездки
+  function recalcHours(){
+    const st = toMinutes($('#t_start').value);
+    const en = toMinutes($('#t_end').value);
+    let span = en - st; if (span < 0) span += 24*60; // через полночь
+    const stops = Number($('#t_stops').value)||0;
+    const totalMin = Math.max(0, span + stops);
+    $('#t_hours').value = (totalMin/60).toFixed(1);
+  }
+  ['t_start','t_end','t_stops'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', recalcHours);
+    document.getElementById(id).addEventListener('input', recalcHours);
+  });
+
+  $('#addTripOpen').addEventListener('click', ()=>{
+    editId = null;
+    $('#tripForm').style.display='block';
+    $('#t_date').value = new Date().toISOString().slice(0,10);
+    $('#t_route').value = '';
+    $('#t_train').value = '';
+    $('#t_loco').value = '';
+    $('#t_start').value = '08:00';
+    $('#t_end').value = '17:00';
+    $('#t_stops').value = '0';
+    $('#t_notes').value = '';
+    // clear segs
+    $('#segTable tbody').innerHTML='';
+    recalcHours();
+  });
+  $('#t_cancel').addEventListener('click', ()=> $('#tripForm').style.display='none');
+  $('#t_save').addEventListener('click', ()=>{
+    const {segs, km_total} = collectSegs();
+    const rec = {
+      id: editId || Date.now(),
+      date: $('#t_date').value || new Date().toISOString().slice(0,10),
+      route: $('#t_route').value.trim(),
+      train: $('#t_train').value.trim(),
+      loco: $('#t_loco').value.trim(),
+      start: $('#t_start').value,
+      end: $('#t_end').value,
+      stops: Number($('#t_stops').value)||0,
+      hours: Number($('#t_hours').value)||0,
+      notes: $('#t_notes').value.trim(),
+      segs, km_total
+    };
+    const arr = getTrips();
+    const i = arr.findIndex(x=> x.id===rec.id);
+    if(i>=0) arr[i]=rec; else arr.push(rec);
+    setTrips(arr);
+    $('#tripForm').style.display='none';
+    renderTripsByDays(); updateDashboard(); renderMonths(); updateTotals();
+  });
+
+  // Участки
   function renderSections(){
     const list=$('#sectionList'); list.innerHTML='';
     const arr=S('sections_sf')||[];
-    if(!arr.length){ const x=document.createElement('div'); x.className='muted small'; x.textContent='Нет участков'; list.appendChild(x);}
+    if(!arr.length){ const x=document.createElement('div'); x.className='small'; x.style.opacity=.7; x.textContent='Нет участков'; list.appendChild(x);}
     arr.forEach(s=>{
-      const card=document.createElement('div'); card.className='card';
-      card.innerHTML='<div><b>'+ (s.name||'—') +'</b></div><div class="small muted">'+(s.from||'—')+' → '+(s.to||'—')+' • '+(s.len||0)+' км</div>'
-        +'<div class="row"><button class="btn" data-edit="'+s.id+'">Редактировать</button><button class="btn" data-del="'+s.id+'">Удалить</button></div>';
-      list.appendChild(card);
+      const row=document.createElement('div'); row.className='section';
+      row.innerHTML='<div><b>'+ (s.name||'—') +'</b><div class="small" style="opacity:.7">'+(s.from||'—')+' → '+(s.to||'—')+' • '+(s.len||0)+' км</div></div>'
+        +'<div><button class="btn ghost" data-edit="'+s.id+'">✎</button> <button class="btn ghost" data-del="'+s.id+'">🗑</button></div>';
+      list.appendChild(row);
     });
     list.querySelectorAll('[data-edit]').forEach(btn=> btn.addEventListener('click', ()=>{
-      const id=Number(btn.getAttribute('data-edit')); const s=(S('sections_sf')||[]).find(x=>x.id===id); if(!s) return;
-      $('#sectionForm').style.display='block'; $('#s_name').value=s.name||''; $('#s_from').value=s.from||''; $('#s_to').value=s.to||''; $('#s_len').value=s.len||'';
-      $('#s_save').onclick=()=>{ const arr=S('sections_sf')||[]; const i=arr.findIndex(x=>x.id===id); arr[i]={ id, name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 }; S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections(); };
+      const id=Number(btn.getAttribute('data-edit')); const s=(S('sections_sf')||[]).find(x=>x.id===id);
+      if(!s) return;
+      $('#sectionForm').style.display='block';
+      $('#s_name').value=s.name||''; $('#s_from').value=s.from||''; $('#s_to').value=s.to||''; $('#s_len').value=s.len||'';
+      $('#s_save').onclick=()=>{
+        const arr=S('sections_sf')||[]; const ix=arr.findIndex(x=>x.id===id);
+        arr[ix]={ id, name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 };
+        S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections();
+      };
     }));
-    list.querySelectorAll('[data-del]').forEach(btn=> btn.addEventListener('click', ()=>{ const id=Number(btn.getAttribute('data-del')); const arr=(S('sections_sf')||[]).filter(x=>x.id!==id); S('sections_sf',arr); renderSections(); }));
+    list.querySelectorAll('[data-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+      const id=Number(btn.getAttribute('data-del'));
+      const arr=(S('sections_sf')||[]).filter(x=>x.id!==id); S('sections_sf',arr); renderSections();
+    }));
   }
   $('#addSectionBtn').addEventListener('click', ()=>{
-    $('#sectionForm').style.display='block'; $('#s_name').value=''; $('#s_from').value=''; $('#s_to').value=''; $('#s_len').value='';
-    $('#s_save').onclick=()=>{ const arr=S('sections_sf')||[]; arr.push({ id:Date.now(), name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 }); S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections(); };
+    $('#sectionForm').style.display='block';
+    $('#s_name').value=''; $('#s_from').value=''; $('#s_to').value=''; $('#s_len').value='';
+    $('#s_save').onclick=()=>{
+      const arr=S('sections_sf')||[];
+      arr.push({ id:Date.now(), name:$('#s_name').value.trim(), from:$('#s_from').value.trim(), to:$('#s_to').value.trim(), len:Number($('#s_len').value)||0 });
+      S('sections_sf',arr); $('#sectionForm').style.display='none'; renderSections();
+    };
   });
   $('#s_cancel').addEventListener('click', ()=> $('#sectionForm').style.display='none');
 
-  // trips (simple)
-  function renderTrips(){
-    const list=$('#tripList'); list.innerHTML='';
-    const arr=S('trips_sf')||[];
-    if(!arr.length){ const d=document.createElement('div'); d.className='muted small'; d.textContent='Нет поездок'; list.appendChild(d);}
-    arr.forEach(t=>{ const c=document.createElement('div'); c.className='card'; c.innerHTML='<div><b>'+t.date+'</b> • '+(t.route||'—')+'</div><div class="small muted">'+(t.hours||0)+' ч</div>'; list.appendChild(c); });
-  }
-  $('#addTripBtn').addEventListener('click', ()=>{ 
-    const date=new Date().toISOString().slice(0,10); const route=prompt('Маршрут:',''); const hours=Number(prompt('Часы:','8')||0);
-    const arr=S('trips_sf')||[]; arr.push({ date, route, hours }); S('trips_sf',arr); renderTrips(); updateDashboard();
-  });
-
+  // Дашборд
   function updateDashboard(){
-    const t=S('tariffs_sf')||{ base:358.46, norm:176 };
-    const trips=S('trips_sf')||[];
+    const t=getTariffs();
+    const trips=getTrips();
     const workedMin=Math.round((trips.reduce((a,x)=>a+(Number(x.hours)||0),0))*60);
     const normMin=(Number(t.norm)||0)*60;
     const percent=normMin? Math.round(workedMin/normMin*100) : 0;
     const remain=normMin-workedMin;
+    const now=new Date(); const y=now.getFullYear(), m=now.getMonth(); const daysInMonth=new Date(y,m+1,0).getDate();
+    let elapsedDays=now.getDate();
+    if(($('#normBasis').value||'calendar')==='working'){ elapsedDays=0; for(let d=1; d<=now.getDate(); d++){ const wd=new Date(y,m,d).getDay(); if(wd!==0&&wd!==6) elapsedDays++; } }
+    const totalDays=$('#normBasis').value==='working'? (function(){ let c=0; for(let d=1; d<=daysInMonth; d++){ const wd=new Date(y,m,d).getDay(); if(wd!==0&&wd!==6) c++; } return c; })() : daysInMonth;
+    const planHours=Math.round((Number(t.norm)||0)*(elapsedDays/totalDays));
+    const planPercent=planHours? Math.round((workedMin/60)/planHours*100):0;
     $('#mwNorm').textContent=(t.norm||0)+' ч';
     $('#mwWorked').textContent=fmtTime(workedMin);
     $('#mwPercent').textContent=percent+'%';
     $('#mwRemain').textContent=remain>=0? ('Осталось: '+fmtTime(remain)) : ('Переработка: '+fmtTime(-remain));
     $('#mwBar').style.width=Math.min(percent,100)+'%';
   }
-  $('#normBasis').addEventListener('change', updateDashboard);
 
-  // backup
-  $('#backupBtn').addEventListener('click', ()=>{ const data={ tariffs:S('tariffs_sf')||{}, trips:S('trips_sf')||[], sections:S('sections_sf')||[], refs:S('refs_sf')||'' };
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='bm-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url), 500);
+  function init(){
+    loadTariffsToForm();
+    loadProfiles();
+    renderTripsByDays();
+    renderMonths();
+    renderSections();
+    updateDashboard();
+    updateTotals();
+  }
+  init();
+
+  // Бэкап
+  $('#backupBtn').addEventListener('click', ()=>{
+    const data = {
+      tariffs: getTariffs(),
+      trips: getTrips(),
+      sections: S('sections_sf')||[],
+      refs: S('refs_sf')||'',
+      profiles: S('profiles_sf')||[]
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'bm-backup.json'; a.click();
+    setTimeout(()=> URL.revokeObjectURL(url), 500);
   });
-  $('#restoreFile').addEventListener('change', e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ const d=JSON.parse(rd.result);
-    if(d.tariffs) S('tariffs_sf', d.tariffs); if(d.trips) S('trips_sf', d.trips); if(d.sections) S('sections_sf', d.sections); if('refs' in d) S('refs_sf', d.refs);
-    renderTrips(); renderSections(); updateDashboard(); alert('Восстановлено'); }catch(err){ alert('Ошибка файла'); } }; rd.readAsText(f); });
+  $('#restoreFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      try{
+        const d = JSON.parse(rd.result);
+        if(d.tariffs) setTariffs(d.tariffs);
+        if(d.trips) setTrips(d.trips);
+        if(d.sections) S('sections_sf', d.sections);
+        if('refs' in d) S('refs_sf', d.refs);
+        if(Array.isArray(d.profiles)) S('profiles_sf', d.profiles);
+        init();
+        alert('Бэкап восстановлен');
+      }catch(err){ alert('Ошибка файла: '+err.message); }
+    };
+    rd.readAsText(file);
+  });
 
-  // init
-  renderTrips(); renderSections(); updateDashboard();
+  // Экспорт месяцов CSV / Печать PDF
+  $('#exportMonthsCsv').addEventListener('click', exportMonthsCsv);
+  $('#printMonth').addEventListener('click', printCurrentMonth);
+
 })();
 </script>
 </body>
