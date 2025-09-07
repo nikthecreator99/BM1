@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Блокнот Машиниста · Lite v2025.25x12-PWA</title>
+<meta name="theme-color" content="#d32f2f">
+<base href="./">
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="БМ Lite">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=202525x12">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png?v=202525x12">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png?v=202525x12">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png?v=202525x12">
+
+<style>
+/* === оформление === */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+:root{--red:#d32f2f;--bg:#0f1420;--card:#161d2a;--line:#243246;--mut:#8aa0b6;--txt:#e9eef5}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;background:var(--red);color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;z-index:10}
+h1{margin:0;font-size:18px}
+.badge{font-size:12px;padding:2px 8px;border:1px solid rgba(255,255,255,.4);border-radius:999px}
+.container{padding:12px 12px 84px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0}
+.row label{width:48%;color:var(--mut);font-size:14px}
+.row input,.row select,.row textarea{flex:1;background:#0e1622;border:1px solid var(--line);color:#e9eef5;padding:10px;border-radius:10px;font-size:16px}
+.row textarea{min-height:90px;resize:vertical}
+.btn{background:#1b2738;color:#fff;border:1px solid var(--line);padding:10px 14px;border-radius:10px;font-size:15px}
+.btn.primary{background:#fff;color:#d32f2f;border-color:#fff}
+.small{font-size:12px}
+.view{display:none}
+.view.active{display:block}
+.tabbar{position:fixed;left:0;right:0;bottom:0;height:70px;background:#121828;border-top:1px solid var(--line);display:flex}
+.tabbar button{flex:1;background:transparent;border:none;color:#8aa0b6;font-size:12px;padding:6px 0}
+.tabbar button.active{color:#fff}
+.tabbar .ico{display:block;font-size:18px;margin-bottom:4px}
+.progress{height:10px;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#0f2035}
+.progress>div{height:100%;background:#d32f2f;width:0%}
+.trip{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #233246}
+.trip:last-child{border-bottom:0}
+.actions{display:flex;gap:6px}
+.tap{cursor:pointer}
+.money{white-space:nowrap}
+.legend{color:#a9bacd;font-size:12px;margin:-2px 0 6px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 4px;border-bottom:1px solid #233246;text-align:left}
+th{color:#a9bacd}
+.badge-live{display:inline-block;background:rgba(211,47,47,.15);border:1px solid rgba(211,47,47,.6);color:#ff8a80;padding:2px 6px;border-radius:999px;font-size:12px;margin-left:6px;white-space:nowrap}
+.mono{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+
+<!-- === редирект в правильный путь /BM1/ === -->
+<script>
+(function hardRedirectToRepo(){
+  var REPO = 'BM1';
+  var need = '/' + REPO + '/';
+  var p = location.pathname;
+  if (!p.startsWith(need)) {
+    location.replace('https://' + location.host + need);
+  } else if (p.endsWith('/index.html')) {
+    location.replace('./');
+  }
+})();
+</script>
+
+<header>
+  <h1>Блокнот Машиниста</h1>
+  <div class="badge">Lite v2025.25x12-PWA</div>
+</header>
+
+<main class="container">
+  <!-- === ГЛАВНАЯ === -->
+  <section id="v-dashboard" class="view active">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Месячная норма</b><b id="mwNorm">—</b>
+      </div>
+      <div class="progress" style="margin-top:6px"><div id="mwBar"></div></div>
+      <div class="row"><label>Норма, ч/мес</label><input id="tar_norm" type="number" oninput="tarSave()"></div>
+      <div class="row"><label>Отработано</label><div id="mwWorked" class="small mono">—</div></div>
+      <div class="row"><label>Выполнено</label><div id="mwPercent" class="small mono">—</div></div>
+      <div class="row"><label>Осталось</label><div id="mwRemain" class="small mono">—</div></div>
+      <div class="row"><label>Зарплата</label><div id="mwSalary" class="small mono">—</div></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b>Поездки</b>
+        <div><button class="btn primary" onclick="addTripOpen()">+ Добавить</button></div>
+      </div>
+      <div id="daysList" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- === УЧАСТКИ === -->
+  <section id="v-sections" class="view">
+    <div class="card">
+      <b>Участки</b>
+      <div id="sectionList"></div>
+    </div>
+  </section>
+
+  <!-- === ТАРИФЫ === -->
+  <section id="v-tariffs" class="view">
+    <div class="card">
+      <b>Тариф</b>
+      <div class="row"><label>₽/час</label><input id="tar_base" type="number"></div>
+      <div class="row"><label>Районный %</label><input id="tar_rc" type="number"></div>
+      <div class="row"><label>Северный %</label><input id="tar_north" type="number"></div>
+    </div>
+  </section>
+
+  <!-- === НАСТРОЙКИ === -->
+  <section id="v-settings" class="view">
+    <div class="card">
+      <b>Бэкап</b>
+      <div class="row"><button class="btn" onclick="backup()">Скачать JSON</button></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar">
+  <button class="active" data-tab="dashboard" onclick="nav(this)"><span class="ico">🏠</span>Главная</button>
+  <button data-tab="sections" onclick="nav(this)"><span class="ico">🗺️</span>Участки</button>
+  <button data-tab="tariffs" onclick="nav(this)"><span class="ico">💳</span>Тариф</button>
+  <button data-tab="settings" onclick="nav(this)"><span class="ico">⚙️</span>Настройки</button>
+</nav>
+
+<script>
+/* ===== helpers ===== */
+function $(s){return document.querySelector(s)}
+function $all(s){return Array.from(document.querySelectorAll(s))}
+function S(k,v){if(arguments.length===2){localStorage.setItem(k,JSON.stringify(v));return v}try{let r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
+
+/* ===== навигация ===== */
+function nav(btn){$all('.tabbar button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');let v=btn.getAttribute('data-tab');$all('.view').forEach(x=>x.classList.remove('active'));$('#v-'+v).classList.add('active')}
+
+/* ===== тариф ===== */
+function getTar(){return S('tar')||{base:358,norm:176,rc:20,north:50}}
+function tarSave(){let t=getTar(); t.base=Number($('#tar_base').value)||t.base; t.norm=Number($('#tar_norm').value)||t.norm; t.rc=Number($('#tar_rc').value)||0; t.north=Number($('#tar_north').value)||0; S('tar',t); updateDash();}
+function loadTar(){let t=getTar(); $('#tar_base').value=t.base; $('#tar_norm').value=t.norm; $('#tar_rc').value=t.rc; $('#tar_north').value=t.north;}
+
+/* ===== поездки ===== */
+function getTrips(){return S('trips')||[]} function setTrips(a){S('trips',a)}
+function addTripOpen(){let arr=getTrips(); let t={id:Date.now(),hours:8,date:new Date().toISOString().slice(0,10),route:'Маршрут'}; arr.push(t); setTrips(arr); renderTrips(); updateDash();}
+function renderTrips(){let box=$('#daysList');box.innerHTML='';let arr=getTrips(); if(!arr.length){box.textContent='Нет поездок';return} arr.forEach(t=>{let div=document.createElement('div');div.className='trip';div.innerHTML='<div><b>'+t.date+'</b> '+t.route+'</div><div>'+t.hours+' ч</div>';box.appendChild(div)});}
+
+/* ===== дашборд ===== */
+function updateDash(){let t=getTar(); let trips=getTrips(); let mins=trips.reduce((a,x)=>a+x.hours*60,0); let norm=t.norm*60; let pct=norm?Math.round(mins/norm*100):0; let rem=norm-mins; $('#mwNorm').textContent=t.norm+' ч'; $('#mwWorked').textContent=(mins/60).toFixed(1)+' ч'; $('#mwPercent').textContent=pct+'%'; $('#mwRemain').textContent=(rem/60).toFixed(1)+' ч'; $('#mwSalary').textContent=(mins/60*t.base).toFixed(0)+' ₽'; $('#mwBar').style.width=Math.min(pct,100)+'%';}
+
+/* ===== бэкап ===== */
+function backup(){ let data={tar:getTar(),trips:getTrips()}; let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='bm-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500);}
+
+/* init */
+function init(){loadTar();renderTrips();updateDash();}
+init();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+</body>
+</html>
