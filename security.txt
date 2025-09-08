@@ -1,0 +1,5 @@
+Contact: https://t.me/nikitagrigorev99
+Preferred-Languages: ru, en
+Encryption: none
+Policy: https://<username>.github.io/<repo>/SECURITY.md
+Acknowledgments: https://<username>.github.io/<repo>/thanks.html
