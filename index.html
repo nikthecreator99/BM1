@@ -1070,6 +1070,83 @@ function init(){
   if($('#filesList')) renderFilesList();
 }
 document.addEventListener('DOMContentLoaded', init);
+<script>
+/* ===== FULL REST PATCH v2025.30-safe ===== */
+(function(){
+  // последняя поездка по реальному времени окончания
+  function lastTrip(){
+    const arr = (getTrips()||[]).slice();
+    if(!arr.length) return null;
+
+    function endMs(t){
+      const ints = intervalsForTrip(t);
+      if(!ints.length) return null;
+      return Math.max(...ints.map(p=>p[1])); // последний конец
+    }
+    arr.sort((a,b)=>{
+      const ea=endMs(a)||0, eb=endMs(b)||0;
+      if(ea!==eb) return eb-ea;
+      return (b.id||0)-(a.id||0);
+    });
+    return arr[0]||null;
+  }
+
+  // основной расчёт
+  window.calcFullRest = function(){
+    const box = document.getElementById('restResult');
+    if(!box){ alert('Не найден контейнер результата'); return; }
+
+    const t = lastTrip();
+    if(!t){
+      box.innerHTML = '<div class="small" style="opacity:.7">Нет поездок</div>';
+      return;
+    }
+
+    const tz = getSelectedTzOffsetMin();
+    const intervals = intervalsForTrip(t);
+    const workEnd = Math.max(...intervals.map(p=>p[1])); // момент окончания последнего плеча/следования
+
+    // правило: базово 40 ч + окна 00–05 (1 окно обычный рейс, 2 окна — «две ночи»)
+    const baseHours = 40;
+    const needWindows = isTwoNightsTrip(t) ? 2 : 1;
+
+    let restEnd = workEnd + baseHours*60*60*1000;
+
+    // добиваем до нужного числа окон 00–05 локального времени
+    while(countNightWindows0005(workEnd, restEnd, tz) < needWindows){
+      restEnd += 24*60*60*1000; // прибавляем сутки, пока не наберётся достаточно окон
+    }
+
+    // вывод
+    const endStr   = fmtLocalFull(new Date(workEnd), tz);
+    const restStr  = fmtLocalFull(new Date(restEnd), tz);
+    const remain   = Math.max(0, restEnd - Date.now());
+    const remainStr= humanSince(remain);
+
+    box.innerHTML = `
+      <div class="kv">
+        <div>Окончание работы:</div><div><b>${endStr}</b></div>
+        <div>Правило отдыха:</div><div>${baseHours} ч + окна 00–05: <b>${needWindows}</b> шт.</div>
+        <div>Можно выходить:</div><div><b>${restStr}</b></div>
+        <div>Осталось:</div><div>${remainStr}</div>
+      </div>
+      <div class="small" style="opacity:.7;margin-top:6px">
+        Расчёт учитывает локальный часовой пояс и реальное попадание окон 00–05 между концом работы и окончанием отдыха.
+      </div>`;
+  };
+
+  window.closeFullRest = function(){
+    const box = document.getElementById('restResult');
+    if(box) box.innerHTML = '';
+  };
+
+  // авто-обновление таймера «Осталось» раз в минуту, если блок открыт
+  setInterval(()=>{
+    const box = document.getElementById('restResult');
+    if(box && box.innerHTML.trim()) { try{ window.calcFullRest(); }catch(_){} }
+  }, 60000);
+})();
+</script>
 </script>
 </body>
 </html>
