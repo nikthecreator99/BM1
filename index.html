@@ -1070,6 +1070,50 @@ function init(){
   if($('#filesList')) renderFilesList();
 }
 document.addEventListener('DOMContentLoaded', init);
+<script>
+/* ======= Функция полного отдыха ======= */
+function calcFullRest(){
+  const trips = getTrips();
+  if(!trips.length){ 
+    $('#restResult').innerHTML='<div class="small" style="opacity:.7">Нет поездок</div>'; 
+    return;
+  }
+  const t = trips[trips.length-1]; // последняя поездка
+  const tz = getSelectedTzOffsetMin();
+
+  const d1 = t.date, d2 = effectiveReturnDateForTrip(t);
+  const start = epochFromDateTimeTz(d1, t.start1, tz);
+  const end   = epochFromDateTimeTz(d2, t.end2, tz);
+  if(!start || !end){ 
+    $('#restResult').innerHTML='<div class="small" style="opacity:.7">Нет данных для расчёта</div>'; 
+    return; 
+  }
+
+  const minsWork = Math.round((end-start)/60000);
+  let restMin = Math.floor(minsWork/2);
+  if(restMin < 240) restMin = 240; // минимум 4ч
+  const restEnd   = new Date(end + restMin*60000);
+  const fullRest  = new Date(end + minsWork*2.6*60000);
+  const fullRestW = new Date(fullRest.getTime() + 24*60*60000);
+
+  function fmt(d){
+    return d.getDate().toString().padStart(2,'0')+'.'+
+           (d.getMonth()+1).toString().padStart(2,'0')+'.'+
+           d.getFullYear()+' '+d.getHours().toString().padStart(2,'0')+':'+
+           d.getMinutes().toString().padStart(2,'0');
+  }
+
+  $('#restResult').innerHTML = `
+    <div>Время на работе: ${fmtHMWords(minsWork)}</div>
+    <div>Отдых: ${fmtHMWords(restMin)} (до ${fmt(restEnd)})</div>
+    <div>Полный отдых: до ${fmt(fullRest)}</div>
+    <div>Полный отдых с выходным: до ${fmt(fullRestW)}</div>
+  `;
+}
+
+function closeFullRest(){
+  $('#restResult').innerHTML='';
+}
 </script>
 </body>
 </html>
