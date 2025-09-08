@@ -1114,6 +1114,181 @@ function calcFullRest(){
 function closeFullRest(){
   $('#restResult').innerHTML='';
 }
+</script><script>
+/* ==== TOAST (всплывашка) ==== */
+(function(){
+  if (document.getElementById('bm-toast')) return;
+  const el = document.createElement('div');
+  el.id='bm-toast';
+  el.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(16,22,34,.96);color:#fff;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);font-size:14px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s';
+  document.body.appendChild(el);
+  window.toast = function(msg){
+    const box = document.getElementById('bm-toast'); if(!box) return;
+    box.textContent=msg||'Готово';
+    box.style.opacity='1';
+    clearTimeout(window.__toast_t);
+    window.__toast_t = setTimeout(()=>{ box.style.opacity='0'; }, 1400);
+  };
+})();
+
+/* ==== ПОЛНЫЙ ОТДЫХ ПО ПОСЛЕДНЕЙ ПОЕЗДКЕ ==== */
+/* Правила можно подкрутить:
+   baseRestHours = 12 часов после окончания последнего плеча;
+   если «две ночи» — +6 часов к базовому (итого 18).
+*/
+(function(){
+  function getLastTrip(){
+    const arr = (window.getTrips ? getTrips() : []) || [];
+    if(!arr.length) return null;
+    // Максимум по дате и id
+    return arr.slice().sort((a,b)=> (a.date||'').localeCompare(b.date) || (a.id-b.id)).pop();
+  }
+  function tzOff(){ return (window.getSelectedTzOffsetMin ? getSelectedTzOffsetMin() : -new Date().getTimezoneOffset()); }
+  function dtToEpoch(d,t){ if(!window.epochFromDateTimeTz) return null; return epochFromDateTimeTz(d,t,tzOff()); }
+  function effReturnDate(t){
+    if(t.date2 && t.date2.trim()) return t.date2.trim();
+    // если начало "обратно" меньше конца "туда" — значит возврат на след. день
+    const s2=t.start2, e1=t.end1;
+    if(s2 && e1 && toMin && toMin(s2)!=null && toMin(e1)!=null && toMin(s2)<toMin(e1)){
+      return dateAddDays(t.date,1);
+    }
+    return t.date;
+  }
+  function isTwoNights(t){
+    if(!window.isTwoNightsTrip) return false;
+    return isTwoNightsTrip(t);
+  }
+  function fmtDT(ms){
+    const off = tzOff();
+    const d = new Date(ms + off*60000);
+    const y=d.getUTCFullYear(), m=String(d.getUTCMonth()+1).padStart(2,'0'), da=String(d.getUTCDate()).padStart(2,'0');
+    const hh=String(d.getUTCHours()).padStart(2,'0'), mi=String(d.getUTCMinutes()).padStart(2,'0');
+    return `${da}.${m}.${y} ${hh}:${mi}`;
+  }
+  window.calcFullRest = function(){
+    const box = document.getElementById('restResult');
+    if(!box){ alert('Нет контейнера для результата'); return; }
+
+    const t = getLastTrip();
+    if(!t){ box.innerHTML = `<div class="small" style="opacity:.8">Поездок нет</div>`; return; }
+
+    // Конец работы = конец второго плеча, если есть; иначе конец первого
+    const d2 = effReturnDate(t);
+    let endEpoch = null;
+    if(t.end2 && t.start2){
+      endEpoch = dtToEpoch(d2, t.end2);
+      const start2 = dtToEpoch(d2, t.start2);
+      if(endEpoch!=null && start2!=null && endEpoch <= start2) endEpoch += 24*60*60000;
+    }else if(t.end1 && t.start1){
+      endEpoch = dtToEpoch(t.date, t.end1);
+      const start1 = dtToEpoch(t.date, t.start1);
+      if(endEpoch!=null && start1!=null && endEpoch <= start1) endEpoch += 24*60*60000;
+    }
+
+    if(endEpoch==null){
+      box.innerHTML = `<div class="small" style="opacity:.8">Не хватает данных по последней поездке (нет конца работы)</div>`;
+      return;
+    }
+
+    const baseRestHours = 12;
+    const extra = isTwoNights(t) ? 6 : 0;
+    const neededMs = (baseRestHours + extra) * 60 * 60 * 1000;
+
+    const restUntil = endEpoch + neededMs;
+    const now = Date.now();
+
+    const leftMs = restUntil - now;
+    const done = leftMs <= 0;
+
+    function human(ms){
+      let m = Math.max(0, Math.floor(ms/60000));
+      const h = Math.floor(m/60); m = m%60;
+      return `${h}ч ${String(m).padStart(2,'0')}м`;
+    }
+
+    box.innerHTML = `
+      <div class="kv">
+        <div>Окончание работы:</div><div><b>${fmtDT(endEpoch)}</b></div>
+        <div>Правило отдыха:</div><div>${baseRestHours} ч${extra?` + ${extra} ч («две ночи»)`:''}</div>
+        <div>Полный отдых до:</div><div><b>${fmtDT(restUntil)}</b></div>
+        <div>Статус:</div><div>${done?'<span class="badge-live" style="margin:0">получен</span>':'идёт'}</div>
+        <div>Осталось:</div><div>${done?'0ч 00м':human(leftMs)}</div>
+      </div>`;
+  };
+  window.closeFullRest = function(){
+    const box = document.getElementById('restResult');
+    if(box) box.innerHTML = '';
+  };
+})();
+
+/* ==== ПРОФИЛЬ (сохранение/загрузка в localStorage + всплывашка «сохранено») ==== */
+(function(){
+  function S(k,v){
+    try{
+      if(arguments.length===2){ localStorage.setItem(k, JSON.stringify(v)); return v; }
+      const r = localStorage.getItem(k); return r?JSON.parse(r):null;
+    }catch(e){ return null; }
+  }
+  window.getProfile = window.getProfile || function(){
+    return S('profile') || {first:'',last:'',age:'',role:'',place:'',start:'',photo:'',notes:''};
+  };
+  window.setProfile = window.setProfile || function(p){
+    S('profile', p);
+  };
+  function renderTenureLocal(){
+    const inp = document.getElementById('pf_start');
+    const out = document.getElementById('pf_tenure');
+    if(!inp || !out) return;
+    const v = inp.value;
+    if(!v){ out.value=''; return; }
+    const a = new Date(v+'T00:00:00');
+    const b = new Date();
+    let y=b.getFullYear()-a.getFullYear();
+    let m=b.getMonth()-a.getMonth();
+    let d=b.getDate()-a.getDate();
+    if(d<0) m--; if(m<0){ y--; m+=12; }
+    out.value = `${y} ${plural(y,'год','года','лет')} ${m} ${plural(m,'месяц','месяца','месяцев')}`;
+  }
+  window.profileSave = function(){
+    const p = getProfile();
+    const g = id => document.getElementById(id);
+
+    if(g('pf_first')) p.first = g('pf_first').value||'';
+    if(g('pf_last'))  p.last  = g('pf_last').value||'';
+    if(g('pf_age'))   p.age   = g('pf_age').value||'';
+    if(g('pf_role'))  p.role  = g('pf_role').value||'';
+    if(g('pf_place')) p.place = g('pf_place').value||'';
+    if(g('pf_start')) p.start = g('pf_start').value||'';
+    if(g('pf_notes')) p.notes = g('pf_notes').value||'';
+
+    const img = document.getElementById('pfAvatarBig');
+    if(img && img.src) p.photo = img.src;
+
+    setProfile(p);
+    renderTenureLocal();
+    if(window.toast) toast('сохранено'); else alert('сохранено');
+  };
+  window.profilePhotoChanged = window.profilePhotoChanged || function(e){
+    const f=e.target.files?.[0]; if(!f) return;
+    const rd=new FileReader();
+    rd.onload=()=>{ const img=document.getElementById('pfAvatarBig'); if(img) img.src=rd.result; };
+    rd.readAsDataURL(f);
+  };
+  function fillProfile(){
+    const p = getProfile();
+    const g = id => document.getElementById(id);
+    if(g('pf_first')) g('pf_first').value = p.first||'';
+    if(g('pf_last'))  g('pf_last').value  = p.last||'';
+    if(g('pf_age'))   g('pf_age').value   = p.age||'';
+    if(g('pf_role'))  g('pf_role').value  = p.role||'';
+    if(g('pf_place')) g('pf_place').value = p.place||'';
+    if(g('pf_start')) g('pf_start').value = p.start||'';
+    if(g('pf_notes')) g('pf_notes').value = p.notes||'';
+    const img=document.getElementById('pfAvatarBig'); if(img && p.photo) img.src=p.photo;
+    renderTenureLocal();
+  }
+  document.addEventListener('DOMContentLoaded', fillProfile);
+})();
 </script>
 </body>
 </html>
