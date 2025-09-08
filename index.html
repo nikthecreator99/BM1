@@ -696,14 +696,13 @@ function splitMinutesByMonth(legs, tzMin){
   });
   return out;
 }
-
 /* ========= Month filter + search ========= */
 let currentMonthKey=null; // 'YYYY-MM' или null = текущий
 function getCurrentMonthKey(){ if(currentMonthKey) return currentMonthKey; const now=new Date(); return now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0'); }
 
 function toggleMonthPicker(){
   const p=$('#monthPanel'); if(!p) return;
-  if(p.style.display==='none'||p.style.display===''){ // построить список 12 месяцев
+  if(p.style.display==='none'||p.style.display===''){
     const now=new Date();
     let html='';
     for(let i=0;i<12;i++){
@@ -720,7 +719,8 @@ function pickMonth(key){ currentMonthKey=key; $('#monthPanel').style.display='no
 function applySearch(){
   const q=($('#searchTrips').value||'').trim().toLowerCase();
   renderTrips(q);
-}<script>
+}
+
 /* ======= Month state & toolbar ======= */
 function ymOf(d){ return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`; }
 function todayYM(){ const now=new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
@@ -731,8 +731,6 @@ function ensureSearchToolbar(){
   const container = document.querySelector('#v-dashboard .card'); // первая карточка — «Месячная норма»
   const after = container?.nextElementSibling;                    // следующая — «Поездки»
   if(!container || !after) return;
-
-  // Если уже есть — не дублируем
   if(document.getElementById('monthSearchBar')) return;
 
   const wrap = document.createElement('div');
@@ -760,6 +758,8 @@ function refreshMonthUI(){
   const names = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
   lbl.textContent = `${names[(m-1)%12]} ${y}`;
 }
+
+document.addEventListener('DOMContentLoaded', ensureSearchToolbar);
 
 /* ======= Generic time helpers for splitting ======= */
 function tzOffMin(){ return getSelectedTzOffsetMin(); }
