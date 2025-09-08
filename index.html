@@ -1289,6 +1289,55 @@ function closeFullRest(){
   }
   document.addEventListener('DOMContentLoaded', fillProfile);
 })();
+<script>
+/* Надёжно находим кнопку «+ Добавить» в карточке «Поездки» и вешаем обработчик,
+   не меняя HTML. Работает даже если где-то раньше случилась ошибка. */
+document.addEventListener('DOMContentLoaded', function(){
+  // 1) Пытаемся найти карточку «Поездки»
+  const tripsCard = Array.from(document.querySelectorAll('#v-dashboard .card'))
+    .find(card => card.textContent && card.textContent.trim().includes('Поездки'));
+
+  // 2) Внутри неё ищем кнопку с текстом «+ Добавить»
+  let addBtn = null;
+  if (tripsCard) {
+    addBtn = Array.from(tripsCard.querySelectorAll('button'))
+      .find(b => (b.textContent||'').trim().startsWith('+ Добавить'));
+  }
+  // Запасной вариант: любая .btn.primary с «+ Добавить»
+  if (!addBtn) {
+    addBtn = Array.from(document.querySelectorAll('button.btn.primary'))
+      .find(b => (b.textContent||'').trim().startsWith('+ Добавить'));
+  }
+  if (!addBtn) return; // не нашли — тихо выходим
+
+  // 3) Вешаем надёжный обработчик клика
+  addBtn.addEventListener('click', function(ev){
+    ev.preventDefault(); ev.stopPropagation();
+    try {
+      if (typeof window.addTripOpen === 'function') {
+        window.addTripOpen();            // штатный путь
+      } else {
+        // План Б: открываем форму напрямую
+        const form = document.getElementById('tripForm');
+        if (form) {
+          // (необязательно) сбросим форму, если нужна чистая
+          try {
+            if (typeof window.clearTripForm === 'function') clearTripForm();
+            if (typeof window.buildRouteOptions === 'function') buildRouteOptions();
+          } catch (_) {}
+          form.style.display = 'block';
+          try { form.scrollIntoView({behavior:'smooth', block:'start'}); } catch (_){}
+        } else {
+          alert('Форма поездки (#tripForm) не найдена.');
+        }
+      }
+    } catch (e) {
+      console.warn('Ошибка при открытии формы поездки:', e);
+      alert('Не удалось открыть форму. Проверьте консоль.');
+    }
+  }, {passive:false});
+});
+<script>
 </script>
 </body>
 </html>
