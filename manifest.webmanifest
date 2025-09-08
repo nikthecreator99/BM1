@@ -1,0 +1,20 @@
+{
+  "id": "/BM1-new/",
+  "name": "Блокнот Машиниста (Lite)",
+  "short_name": "Блокнот",
+  "description": "Поездки, отдых, зарплата РЖД. PWA-версия.",
+  "start_url": "/BM1-new/?pwa=1",
+  "scope": "/BM1-new/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1420",
+  "theme_color": "#d32f2f",
+  "icons": [
+    { "src": "/BM1-new/apple-touch-icon-180x180.png?v=202530", "sizes": "180x180", "type": "image/png" },
+    { "src": "/BM1-new/apple-touch-icon-167x167.png?v=202530", "sizes": "167x167", "type": "image/png" },
+    { "src": "/BM1-new/apple-touch-icon-152x152.png?v=202530", "sizes": "152x152", "type": "image/png" },
+    { "src": "/BM1-new/apple-touch-icon.png?v=202530",        "sizes": "120x120", "type": "image/png" },
+    { "src": "/BM1-new/icon-512.png?v=202530", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/BM1-new/icon-192.png?v=202530", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
